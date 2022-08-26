@@ -1,15 +1,22 @@
+import { Reactions } from "@prisma/client";
 import { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { trpc } from "../../utils/trpc";
 
+const reactions: { name: string; key: Reactions }[] = [
+  { key: "RELATABLE", name: "✋ Relatable" },
+  { key: "KEEP_GOING", name: "🔥 Keep going!" },
+  { key: "GREAT_JOB", name: "👍 Great job!" },
+];
+
 const PostDetail: NextPage = () => {
   const router = useRouter();
   const { id } = router.query;
-  if (!id || typeof id !== "string") return null;
+  // if (!id || typeof id !== "string") return null;
 
-  const { data } = trpc.useQuery(["post.detail", { id }]);
+  const { data } = trpc.useQuery(["post.detail", { id: id as string }]);
   const { data: comments, isLoading } = trpc.useQuery(["comment.all"]);
 
   return (
@@ -20,34 +27,56 @@ const PostDetail: NextPage = () => {
         <link rel='icon' href='/favicon.ico' />
       </Head>
 
-      <main className=''>
+      <main className='layout space-y-8'>
         {data && (
           <div className='w-full'>
-            <h1 className='text-5xl md:text-[5rem] leading-normal font-extrabold text-gray-700'>
-              {data.title}
-            </h1>
-            <div>
+            <h1 className='text-3xl font-bold '>{data.title}</h1>
+            <div className='flex item-start'>
               <Image src={data.User.avatarUrl} alt={data.User.name} width='50' height='50' />
-              <span>{data.User.name}</span>
+              <span>
+                {data.User.name} - {data.User.confidencePoint}
+              </span>
             </div>
+            <p>{data.problem}</p>
           </div>
         )}
-        <div className='w-full'>
-          {comments && comments.length > 0 ? (
-            <ul>
-              {comments.map(comment => {
-                return (
-                  <li key={comment.id}>
-                    <h3>{comment.User.name}</h3>
-                    <p>{comment.content}</p>
-                  </li>
-                );
-              })}
-            </ul>
-          ) : (
-            <p>No Support yet!</p>
-          )}
+        <div>
+          <h2 className='text-2xl'>Give support to {data?.User.name}</h2>
+          <form className='w-full space-y-4' onSubmit={e => e.preventDefault()}>
+            <div className='flex gap-2 mt-4'>
+              {reactions.map(reaction => (
+                <button key={reaction.key} className='px-2 py-1 text-sm  rounded-md bg-yellow-300'>
+                  {reaction.name}
+                </button>
+              ))}
+            </div>
+            <div className='w-full space-y-2'>
+              <label htmlFor='support'>Write your support</label>
+              <textarea
+                name='support'
+                id='support'
+                cols={30}
+                rows={5}
+                className='resize-y w-full'
+              />
+            </div>
+          </form>
         </div>
+        {/*TODO: Should be a form with comment here */}
+        {comments && comments.length > 0 ? (
+          <ul>
+            {comments.map(comment => {
+              return (
+                <li key={comment.id}>
+                  <h3>{comment.User.name}</h3>
+                  <p>{comment.content}</p>
+                </li>
+              );
+            })}
+          </ul>
+        ) : (
+          <p>No Support yet!</p>
+        )}
       </main>
     </>
   );

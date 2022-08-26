@@ -51,15 +51,6 @@ const Home: NextPage = () => {
                         </div>
                       </div>
                       <p className=''>{post.problem}</p>
-                      <div className='flex gap-2 mt-4'>
-                        {reactions.map(reaction => (
-                          <button
-                            key={reaction.key}
-                            className='px-2 py-1 text-sm  rounded-md bg-yellow-300'>
-                            {reaction.name}
-                          </button>
-                        ))}
-                      </div>
                     </li>
                   </>
                 );
