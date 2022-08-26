@@ -4,7 +4,7 @@ import { inferQueryOutput, trpc } from "../utils/trpc";
 import Image from "next/image";
 import Link from "next/link";
 import dayjs from "dayjs";
-import { ChatBubbleBottomCenterTextIcon, UserIcon } from "@heroicons/react/20/solid";
+import { UserIcon } from "@heroicons/react/20/solid";
 
 const Home: NextPage = () => {
   const { data, isLoading } = trpc.useQuery(["post.all"]);
@@ -21,7 +21,7 @@ const Home: NextPage = () => {
         <h1 className='text-2xl'>Peer Support</h1>
         <div className='w-full p-3 flex items-center bg-gray-100 rounded-md'>
           <Image
-            src={"https://avatars.dicebear.com/api/big-smile/random.svg"}
+            src='https://avatars.dicebear.com/api/big-smile/random.svg'
             alt='dummy profile'
             width='50'
             height='50'

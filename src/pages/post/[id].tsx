@@ -3,6 +3,7 @@ import { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import { useRouter } from "next/router";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { trpc } from "../../utils/trpc";
 
 const reactions: { name: string; key: Reactions }[] = [
@@ -11,13 +12,28 @@ const reactions: { name: string; key: Reactions }[] = [
   { key: "GREAT_JOB", name: "👍 Great job!" },
 ];
 
+type FormValues = {
+  content: string;
+  reaction: Reactions;
+};
 const PostDetail: NextPage = () => {
   const router = useRouter();
   const { id } = router.query;
   // if (!id || typeof id !== "string") return null;
 
+  const { register, handleSubmit } = useForm<FormValues>({
+    defaultValues: {
+      reaction: "RELATABLE",
+    },
+  });
+
   const { data } = trpc.useQuery(["post.detail", { id: id as string }]);
   const { data: comments, isLoading } = trpc.useQuery(["comment.all"]);
+
+  const onSubmit: SubmitHandler<FormValues> = data => {
+    console.log(data);
+    return;
+  };
 
   return (
     <>
@@ -42,27 +58,39 @@ const PostDetail: NextPage = () => {
         )}
         <div>
           <h2 className='text-2xl'>Give support to {data?.User.name}</h2>
-          <form className='w-full space-y-4' onSubmit={e => e.preventDefault()}>
+          <form className='w-full space-y-4' onSubmit={handleSubmit(onSubmit)}>
             <div className='flex gap-2 mt-4'>
               {reactions.map(reaction => (
-                <button key={reaction.key} className='px-2 py-1 text-sm  rounded-md bg-yellow-300'>
-                  {reaction.name}
-                </button>
+                <div key={reaction.key} className='relative'>
+                  <input
+                    type='radio'
+                    id={reaction.key}
+                    key={reaction.key}
+                    {...register("reaction", { required: true })}
+                    value={reaction.key}
+                    className='absolute bg-transparent border-none  w-0 h-0 focus:ring-0 peer'
+                  />
+                  <label
+                    htmlFor={reaction.key}
+                    className='px-2 py-1 text-sm  rounded-md bg-yellow-300 peer-focus:bg-red-400 peer-checked:bg-red-400'>
+                    {reaction.name}
+                  </label>
+                </div>
               ))}
             </div>
             <div className='w-full space-y-2'>
-              <label htmlFor='support'>Write your support</label>
+              <label htmlFor='content'>Write your content</label>
               <textarea
-                name='support'
-                id='support'
+                {...register("content", { required: true })}
+                id='content'
                 cols={30}
                 rows={5}
                 className='resize-y w-full'
               />
             </div>
+            <button className='px-3 py-1 rounded-sm bg-blue-500 text-white'>Submit</button>
           </form>
         </div>
-        {/*TODO: Should be a form with comment here */}
         {comments && comments.length > 0 ? (
           <ul>
             {comments.map(comment => {
