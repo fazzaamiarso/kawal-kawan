@@ -2,18 +2,6 @@ import { createRouter } from "./context";
 import { z } from "zod";
 
 export const postRouter = createRouter()
-  .query("hello", {
-    input: z
-      .object({
-        text: z.string().nullish(),
-      })
-      .nullish(),
-    resolve({ input }) {
-      return {
-        greeting: `Hello ${input?.text ?? "world"}`,
-      };
-    },
-  })
   .query("all", {
     async resolve({ ctx }) {
       const posts = await ctx.prisma.post.findMany({
@@ -21,6 +9,18 @@ export const postRouter = createRouter()
           User: true,
         },
       });
-      return { posts };
+      return posts;
+    },
+  })
+  .query("detail", {
+    input: z.object({
+      id: z.string(),
+    }),
+    resolve({ ctx, input }) {
+      const details = ctx.prisma.post.findUnique({
+        where: { id: input.id },
+        include: { User: true },
+      });
+      return details;
     },
   });

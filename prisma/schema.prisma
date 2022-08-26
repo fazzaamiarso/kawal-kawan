@@ -43,6 +43,7 @@ model Post {
     id        String    @id @default(cuid())
     createdAt DateTime  @default(now())
     updatedAt DateTime  @default(now())
+    title     String    @default("should remove this later")
     problem   String    @db.Text
     User      User      @relation(fields: [userId], references: [id])
     userId    String

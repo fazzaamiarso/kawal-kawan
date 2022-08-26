@@ -3,6 +3,7 @@ import Head from "next/head";
 import { trpc } from "../utils/trpc";
 import Image from "next/image";
 import { Reactions } from "@prisma/client";
+import Link from "next/link";
 
 const reactions: { name: string; key: Reactions }[] = [
   { key: "RELATABLE", name: "✋ Relatable" },
@@ -26,10 +27,10 @@ const Home: NextPage = () => {
           Peer Support
         </h1>
         <div className='pt-6 flex justify-center items-center w-full'>
-          {!isLoading && data?.posts.length === 0 && <p>No Posts Yet</p>}
+          {!isLoading && data?.length === 0 && <p>No Posts Yet</p>}
           {data ? (
             <ul className='space-y-6'>
-              {data.posts.map(post => {
+              {data.map(post => {
                 return (
                   <>
                     <li key={post.id + Math.random()} className='bg-gray-100 p-4 rounded-md '>
@@ -41,12 +42,16 @@ const Home: NextPage = () => {
                           height='50'
                         />
                         <div>
-                          <h2>{post.User.name}</h2>
+                          <h2>
+                            <Link href={`/post/${post.id}`}>
+                              <a className='text-blue-500 hover:underline'>{post.User.name}</a>
+                            </Link>
+                          </h2>
                           <span>{post.User.confidencePoint} confidence point</span>
                         </div>
                       </div>
                       <p className=''>{post.problem}</p>
-                      <div className='flex gap-2'>
+                      <div className='flex gap-2 mt-4'>
                         {reactions.map(reaction => (
                           <button
                             key={reaction.key}
@@ -55,66 +60,6 @@ const Home: NextPage = () => {
                           </button>
                         ))}
                       </div>
-                    </li>
-                    <li key={post.id + Math.random()} className='bg-gray-100 p-4 rounded-md '>
-                      <div className='flex items-center gap-2'>
-                        <Image
-                          src={post.User.avatarUrl}
-                          alt={post.User.name}
-                          width='50'
-                          height='50'
-                        />
-                        <div>
-                          <h2>{post.User.name}</h2>
-                          <span>{post.User.confidencePoint} confidence point</span>
-                        </div>
-                      </div>
-                      <p className=''>{post.problem}</p>
-                    </li>
-                    <li key={post.id + Math.random()} className='bg-gray-100 p-4 rounded-md '>
-                      <div className='flex items-center gap-2'>
-                        <Image
-                          src={post.User.avatarUrl}
-                          alt={post.User.name}
-                          width='50'
-                          height='50'
-                        />
-                        <div>
-                          <h2>{post.User.name}</h2>
-                          <span>{post.User.confidencePoint} confidence point</span>
-                        </div>
-                      </div>
-                      <p className=''>{post.problem}</p>
-                    </li>
-                    <li key={post.id + Math.random()} className='bg-gray-100 p-4 rounded-md '>
-                      <div className='flex items-center gap-2'>
-                        <Image
-                          src={post.User.avatarUrl}
-                          alt={post.User.name}
-                          width='50'
-                          height='50'
-                        />
-                        <div>
-                          <h2>{post.User.name}</h2>
-                          <span>{post.User.confidencePoint} confidence point</span>
-                        </div>
-                      </div>
-                      <p className=''>{post.problem}</p>
-                    </li>
-                    <li key={post.id + Math.random()} className='bg-gray-100 p-4 rounded-md '>
-                      <div className='flex items-center gap-2'>
-                        <Image
-                          src={post.User.avatarUrl}
-                          alt={post.User.name}
-                          width='50'
-                          height='50'
-                        />
-                        <div>
-                          <h2>{post.User.name}</h2>
-                          <span>{post.User.confidencePoint} confidence point</span>
-                        </div>
-                      </div>
-                      <p className=''>{post.problem}</p>
                     </li>
                   </>
                 );
