@@ -6,10 +6,43 @@ generator client {
 }
 
 datasource db {
-    provider = "sqlite"
+    provider = "postgresql"
     url      = env("DATABASE_URL")
 }
 
-model Example {
-    id String @id @default(cuid())
+enum Reactions {
+    RELATABLE
+    KEEP_GOING
+    GREAT_JOB
+}
+
+model User {
+    id              String    @id @default(cuid())
+    name            String
+    avatarUrl       String
+    confidencePoint Int       @default(0)
+    email           String
+    posts           Post[]
+    comments        Comment[]
+}
+
+model Comment {
+    id        Int       @id @default(autoincrement())
+    createdAt DateTime  @default(now())
+    content   String    @db.Text
+    reaction  Reactions
+
+    User   User   @relation(fields: [userId], references: [id])
+    userId String
+
+    Post   Post?   @relation(fields: [postId], references: [id])
+    postId String?
+}
+
+model Post {
+    id      String    @id @default(cuid())
+    problem String    @db.Text
+    User    User      @relation(fields: [userId], references: [id])
+    userId  String
+    Comment Comment[]
 }
