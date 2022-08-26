@@ -30,15 +30,14 @@ export const postRouter = createRouter()
     input: z.object({
       title: z.string(),
       problem: z.string(),
-      userId: z.string(),
     }),
     async resolve({ input, ctx }) {
       await ctx.prisma.user.update({
-        where: { id: input.userId },
+        where: { id: ctx.user?.id },
         data: { confidencePoint: { increment: Points.Posting } },
       });
       await ctx.prisma.post.create({
-        data: input,
+        data: { ...input, userId: ctx.user?.id as string },
       });
     },
   });

@@ -4,7 +4,6 @@ import { createRouter } from "./context";
 import Iron from "@hapi/iron";
 import { env } from "env/server.mjs";
 import { setTokenCookie } from "@/lib/cookie";
-import { User } from "@prisma/client";
 import { hashPassword } from "@/lib/bcrypt";
 
 const generateAvatar = (seed: string) => {

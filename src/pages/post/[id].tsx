@@ -5,7 +5,7 @@ import Head from "next/head";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { trpc } from "../../utils/trpc";
+import { trpc } from "@/utils/trpc";
 
 const reactions: { name: string; key: Reactions }[] = [
   { key: "RELATABLE", name: "✋ Relatable" },
@@ -18,7 +18,6 @@ type FormValues = {
   reaction: Reactions;
 };
 
-const USER_ID = "cl7adgsqs0009u3pdb8zbknll";
 const PostDetail: NextPage = () => {
   const router = useRouter();
   const { id } = router.query;
@@ -101,7 +100,7 @@ const SupportForm = ({ postId }: { postId: string }) => {
   const onSubmit: SubmitHandler<FormValues> = data => {
     if (mutation.isLoading) return;
     mutation.mutate(
-      { ...data, userId: USER_ID, postId },
+      { ...data, postId },
       {
         onSuccess: () => {
           utils.invalidateQueries("comment.all");

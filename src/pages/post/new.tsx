@@ -9,7 +9,6 @@ type FormValues = {
   problem: string;
 };
 
-const USER_ID = "cl7adgsqs0009u3pdb8zbknll";
 const NewPost: NextPage = () => {
   const router = useRouter();
   const { register, handleSubmit } = useForm<FormValues>();
@@ -17,7 +16,7 @@ const NewPost: NextPage = () => {
 
   const onSubmit: SubmitHandler<FormValues> = data => {
     if (mutation.isLoading) return;
-    mutation.mutate({ ...data, userId: USER_ID }, { onSuccess: () => router.replace("/") });
+    mutation.mutate({ ...data }, { onSuccess: () => router.replace("/") });
   };
   return (
     <>

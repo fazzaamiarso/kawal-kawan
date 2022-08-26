@@ -22,15 +22,14 @@ export const commentRouter = createRouter()
     input: z.object({
       reaction: z.nativeEnum(Reactions),
       content: z.string(),
-      userId: z.string(),
       postId: z.string(),
     }),
     async resolve({ ctx, input }) {
       await ctx.prisma.comment.create({
-        data: input,
+        data: { ...input, userId: ctx.user?.id as string },
       });
       await ctx.prisma.user.update({
-        where: { id: input.userId },
+        where: { id: ctx.user?.id as string },
         data: { confidencePoint: { increment: Points.Supporting } },
       });
     },
