@@ -5,8 +5,10 @@ import Image from "next/image";
 import Link from "next/link";
 import dayjs from "dayjs";
 import { UserIcon } from "@heroicons/react/20/solid";
+import { useAuth } from "@/hooks/use-auth";
 
 const Home: NextPage = () => {
+  const { user } = useAuth();
   const { data, isLoading } = trpc.useQuery(["post.all"]);
 
   return (
@@ -20,12 +22,7 @@ const Home: NextPage = () => {
       <main className='layout mt-12'>
         <h1 className='text-2xl'>Peer Support</h1>
         <div className='w-full p-3 flex items-center bg-gray-100 rounded-md'>
-          <Image
-            src='https://avatars.dicebear.com/api/big-smile/random.svg'
-            alt='dummy profile'
-            width='50'
-            height='50'
-          />
+          <Image src={user?.avatarUrl ?? ""} alt={user?.name} width='50' height='50' />
           <Link href='/post/new'>
             <a className='px-4 py-1 ring-1 ring-black rounded-full'>
               Share your worry, problems, anything

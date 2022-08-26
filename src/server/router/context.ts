@@ -2,7 +2,9 @@
 import * as trpc from "@trpc/server";
 import * as trpcNext from "@trpc/server/adapters/next";
 import { prisma } from "../db/client";
-
+import Iron from "@hapi/iron";
+import { env } from "env/server.mjs";
+import { User } from "@prisma/client";
 /**
  * Replace this with an object if you want to pass things to createContextInner
  */
@@ -26,8 +28,16 @@ export const createContext = async (opts: trpcNext.CreateNextContextOptions) => 
   const req = opts.req;
   const res = opts.res;
 
+  let user;
+  const authToken = req.cookies["auth_token"];
+  if (!authToken) {
+    user = null;
+  } else {
+    user = (await Iron.unseal(authToken, env.AUTH_SECRET, Iron.defaults)) as User;
+  }
+
   const innerCtx = await createContextInner({});
-  return { ...innerCtx, req, res };
+  return { ...innerCtx, req, res, user };
 };
 
 type Context = trpc.inferAsyncReturnType<typeof createContext>;

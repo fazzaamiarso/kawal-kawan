@@ -1,6 +1,6 @@
+import { useAuth } from "@/hooks/use-auth";
 import Image from "next/image";
 import Link from "next/link";
-import { PlusIcon } from "@heroicons/react/20/solid";
 
 const navigation = [
   { name: "Home", href: "/", current: true },
@@ -9,6 +9,7 @@ const navigation = [
 ];
 
 export default function Navbar() {
+  const { user } = useAuth();
   return (
     <header className='w-full py-4 bg-gray-200'>
       <div className='layout flex items-center justify-between'>
@@ -28,12 +29,7 @@ export default function Navbar() {
         <div className='flex items-center gap-2'>
           <Link href='#'>
             <a className='' aria-label='go to profile'>
-              <Image
-                src='https://avatars.dicebear.com/api/big-smile/random.svg'
-                alt=''
-                width='40'
-                height='40'
-              />
+              <Image src={user?.avatarUrl ?? ""} alt='' width='40' height='40' />
             </a>
           </Link>
         </div>

@@ -4,7 +4,7 @@ export function useAuth() {
   const { data: user, isLoading } = trpc.useQuery(["user.user"]);
 
   return {
-    user,
+    user: user?.user,
     isLoading,
   };
 }

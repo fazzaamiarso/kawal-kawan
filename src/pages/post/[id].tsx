@@ -25,7 +25,7 @@ const PostDetail: NextPage = () => {
   if (typeof id !== "string") return null;
 
   const { data } = trpc.useQuery(["post.detail", { id: id as string }]);
-  const { data: comments, isLoading } = trpc.useQuery(["comment.all"]);
+  const { data: comments, isLoading } = trpc.useQuery(["comment.all", { postId: id as string }]);
 
   return (
     <>

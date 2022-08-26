@@ -47,11 +47,7 @@ export const userRouter = createRouter()
   })
   .query("user", {
     async resolve({ ctx }) {
-      const authToken = ctx.req.cookies["auth_token"];
-      if (!authToken) return { user: null };
-
-      const user = (await Iron.unseal(authToken, env.AUTH_SECRET, Iron.defaults)) as User;
-
+      const user = ctx.user;
       return { user };
     },
   });
