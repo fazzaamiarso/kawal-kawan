@@ -11,6 +11,7 @@ export const serverSchema = z.object({
   TWILIO_ACCOUNT_SID: z.string(),
   TWILIO_AUTH_TOKEN: z.string(),
   TWILIO_SERVICE_SID: z.string(),
+  AUTH_SECRET: z.string(),
 });
 
 /**

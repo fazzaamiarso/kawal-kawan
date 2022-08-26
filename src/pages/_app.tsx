@@ -1,18 +1,46 @@
 // src/pages/_app.tsx
 import { withTRPC } from "@trpc/next";
 import type { AppRouter } from "../server/router";
-import type { AppType } from "next/dist/shared/lib/utils";
 import superjson from "superjson";
 import "../styles/globals.css";
 import Navbar from "@/components/Navbar";
+import { ReactNode, useEffect } from "react";
+import { useAuth } from "@/hooks/use-auth";
+import { NextPage } from "next";
+import { AppProps } from "next/app";
 
-const MyApp: AppType = ({ Component, pageProps }) => {
+type NextPageWithAuthAndLayout = NextPage & {
+  hasAuth?: boolean;
+  getLayout?: (page: React.ReactElement) => React.ReactNode;
+};
+
+type AppPropsWithAuthAndLayout = AppProps & {
+  Component: NextPageWithAuthAndLayout;
+};
+
+const MyApp = ({ Component, pageProps }: AppPropsWithAuthAndLayout) => {
+  const getLayout = Component.getLayout ?? (page => page);
+  const page = getLayout(<Component {...pageProps} />);
+  const hasAuth = Component.hasAuth === undefined || Component.hasAuth;
   return (
     <>
       <Navbar />
-      <Component {...pageProps} />
+      {hasAuth ? <Auth>{page}</Auth> : page}
     </>
   );
+};
+
+const Auth = ({ children }: { children: ReactNode }) => {
+  const { user, isLoading } = useAuth();
+  const isAuthenticated = Boolean(user?.user);
+
+  useEffect(() => {
+    if (isLoading) return;
+    if (!isAuthenticated) return window.location.replace("/auth/signin");
+  }, [isAuthenticated, isLoading]);
+
+  if (isAuthenticated) return <>{children}</>;
+  return null;
 };
 
 const getBaseUrl = () => {
