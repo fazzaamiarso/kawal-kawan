@@ -7,13 +7,11 @@ const serviceSid = env.TWILIO_SERVICE_SID;
 const client = twilio(accountSid, authToken);
 
 export const twilioCreateVerification = async ({ phoneNumber }: { phoneNumber: string }) => {
-  console.log(phoneNumber);
   try {
     const res = await client.verify.v2
       .services(serviceSid)
       .verifications.create({ channel: "sms", to: phoneNumber });
     if (!res) throw Error("");
-    console.log(res.to);
   } catch (err) {
     console.error("ERROR in creating verification message!");
   }
@@ -27,10 +25,11 @@ export const twilioCheckVerification = async ({
   verificationCode: string;
 }) => {
   try {
-    await client.verify.v2
+    const res = await client.verify.v2
       .services(serviceSid)
       .verificationChecks.create({ to: phoneNumber, code: verificationCode });
+    if (!res) throw Error("");
   } catch (err) {
-    console.error("ERROR in creating verification message!");
+    console.error("ERROR in checking verification message!");
   }
 };

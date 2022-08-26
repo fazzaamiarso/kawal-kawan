@@ -32,8 +32,7 @@ const MyApp = ({ Component, pageProps }: AppPropsWithAuthAndLayout) => {
 
 const Auth = ({ children }: { children: ReactNode }) => {
   const { user, isLoading } = useAuth();
-  const isAuthenticated = Boolean(user?.user);
-
+  const isAuthenticated = Boolean(user?.user?.id);
   useEffect(() => {
     if (isLoading) return;
     if (!isAuthenticated) return window.location.replace("/auth/signin");

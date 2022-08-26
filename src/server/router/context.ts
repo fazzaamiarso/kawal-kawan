@@ -25,6 +25,7 @@ export const createContextInner = async (opts: CreateContextOptions) => {
 export const createContext = async (opts: trpcNext.CreateNextContextOptions) => {
   const req = opts.req;
   const res = opts.res;
+
   const innerCtx = await createContextInner({});
   return { ...innerCtx, req, res };
 };

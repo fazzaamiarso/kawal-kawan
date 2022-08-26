@@ -22,7 +22,7 @@ model User {
     username        String    @default("")
     avatarUrl       String
     confidencePoint Int       @default(0)
-    passwordHash    String    @default("")
+    passwordHash    String    @default("") @db.Text
     posts           Post[]
     comments        Comment[]
 }

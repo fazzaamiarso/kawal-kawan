@@ -2,9 +2,10 @@ import { twilioCheckVerification, twilioCreateVerification } from "@/lib/twilio"
 import { z } from "zod";
 import { createRouter } from "./context";
 import Iron from "@hapi/iron";
-import bcrypt from "bcrypt";
 import { env } from "env/server.mjs";
 import { setTokenCookie } from "@/lib/cookie";
+import { User } from "@prisma/client";
+import { hashPassword } from "@/lib/bcrypt";
 
 const generateAvatar = (seed: string) => {
   return `https://avatars.dicebear.com/api/big-smile/${seed}.svg`;
@@ -20,14 +21,12 @@ export const userRouter = createRouter()
       verificationCode: z.string(),
     }),
     async resolve({ ctx, input }) {
+      const passwordHash = await hashPassword(input.password);
       await twilioCheckVerification(input);
-
-      const salt = await bcrypt.genSalt(7);
-      const hashedPassword = await bcrypt.hash(input.password, salt);
 
       const user = await ctx.prisma.user.create({
         data: {
-          passwordHash: hashedPassword,
+          passwordHash,
           username: input.username,
           name: input.name,
           avatarUrl: generateAvatar(input.username),
@@ -47,14 +46,12 @@ export const userRouter = createRouter()
     },
   })
   .query("user", {
-    async resolve({ ctx, input }) {
+    async resolve({ ctx }) {
       const authToken = ctx.req.cookies["auth_token"];
       if (!authToken) return { user: null };
 
-      const user = (await Iron.unseal(authToken, env.AUTH_SECRET, Iron.defaults)) as {
-        user: { id: string };
-      };
+      const user = (await Iron.unseal(authToken, env.AUTH_SECRET, Iron.defaults)) as User;
 
-      return user;
+      return { user };
     },
   });
