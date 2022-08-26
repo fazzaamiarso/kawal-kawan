@@ -1,4 +1,5 @@
 import { Reactions } from "@prisma/client";
+import dayjs from "dayjs";
 import { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
@@ -16,24 +17,15 @@ type FormValues = {
   content: string;
   reaction: Reactions;
 };
+
+const USER_ID = "cl7adgsqs0009u3pdb8zbknll";
 const PostDetail: NextPage = () => {
   const router = useRouter();
   const { id } = router.query;
-  // if (!id || typeof id !== "string") return null;
-
-  const { register, handleSubmit } = useForm<FormValues>({
-    defaultValues: {
-      reaction: "RELATABLE",
-    },
-  });
+  if (typeof id !== "string") return null;
 
   const { data } = trpc.useQuery(["post.detail", { id: id as string }]);
   const { data: comments, isLoading } = trpc.useQuery(["comment.all"]);
-
-  const onSubmit: SubmitHandler<FormValues> = data => {
-    console.log(data);
-    return;
-  };
 
   return (
     <>
@@ -58,45 +50,31 @@ const PostDetail: NextPage = () => {
         )}
         <div>
           <h2 className='text-2xl'>Give support to {data?.User.name}</h2>
-          <form className='w-full space-y-4' onSubmit={handleSubmit(onSubmit)}>
-            <div className='flex gap-2 mt-4'>
-              {reactions.map(reaction => (
-                <div key={reaction.key} className='relative'>
-                  <input
-                    type='radio'
-                    id={reaction.key}
-                    key={reaction.key}
-                    {...register("reaction", { required: true })}
-                    value={reaction.key}
-                    className='absolute bg-transparent border-none  w-0 h-0 focus:ring-0 peer'
-                  />
-                  <label
-                    htmlFor={reaction.key}
-                    className='px-2 py-1 text-sm  rounded-md bg-yellow-300 peer-focus:bg-red-400 peer-checked:bg-red-400'>
-                    {reaction.name}
-                  </label>
-                </div>
-              ))}
-            </div>
-            <div className='w-full space-y-2'>
-              <label htmlFor='content'>Write your content</label>
-              <textarea
-                {...register("content", { required: true })}
-                id='content'
-                cols={30}
-                rows={5}
-                className='resize-y w-full'
-              />
-            </div>
-            <button className='px-3 py-1 rounded-sm bg-blue-500 text-white'>Submit</button>
-          </form>
+          <SupportForm postId={id} />
         </div>
         {comments && comments.length > 0 ? (
-          <ul>
+          <ul className='space-y-4'>
             {comments.map(comment => {
               return (
-                <li key={comment.id}>
-                  <h3>{comment.User.name}</h3>
+                <li key={comment.id} className='p-4 bg-gray-200  rounded-md'>
+                  <div className='flex items-center gap-4 mb-6'>
+                    <Image
+                      src={comment.User.avatarUrl}
+                      alt={comment.User.name}
+                      width='40'
+                      height='40'
+                    />
+                    <div className='flex flex-col items-start'>
+                      <span className='text-sm'>
+                        {comment.User.name} - {comment.User.confidencePoint}
+                      </span>
+
+                      <span className='text-xs'>
+                        posted at {dayjs(comment.createdAt).toString()}
+                      </span>
+                    </div>
+                  </div>
+                  <span className='ring-1 ring-black  rounded-md text-xs'>{comment.reaction}</span>
                   <p>{comment.content}</p>
                 </li>
               );
@@ -111,3 +89,62 @@ const PostDetail: NextPage = () => {
 };
 
 export default PostDetail;
+
+const SupportForm = ({ postId }: { postId: string }) => {
+  const utils = trpc.useContext();
+  const mutation = trpc.useMutation("comment.new");
+  const { register, handleSubmit, reset } = useForm<FormValues>({
+    defaultValues: {
+      reaction: "RELATABLE",
+    },
+  });
+  const onSubmit: SubmitHandler<FormValues> = data => {
+    if (mutation.isLoading) return;
+    mutation.mutate(
+      { ...data, userId: USER_ID, postId },
+      {
+        onSuccess: () => {
+          utils.invalidateQueries("comment.all");
+          reset();
+        },
+      },
+    );
+  };
+
+  return (
+    <form className='w-full space-y-4' onSubmit={handleSubmit(onSubmit)}>
+      <div className='flex gap-2 mt-4'>
+        {reactions.map(reaction => (
+          <div key={reaction.key} className='relative'>
+            <input
+              type='radio'
+              id={reaction.key}
+              key={reaction.key}
+              {...register("reaction", { required: true })}
+              value={reaction.key}
+              className='absolute bg-transparent border-none  w-0 h-0 focus:ring-0 peer'
+            />
+            <label
+              htmlFor={reaction.key}
+              className='px-2 py-1 text-sm  rounded-md bg-yellow-300 peer-focus:bg-red-400 peer-checked:bg-red-400'>
+              {reaction.name}
+            </label>
+          </div>
+        ))}
+      </div>
+      <div className='w-full space-y-2'>
+        <label htmlFor='content'>Write your content</label>
+        <textarea
+          {...register("content", { required: true })}
+          id='content'
+          cols={30}
+          rows={5}
+          className='resize-y w-full'
+        />
+      </div>
+      <button className='px-3 py-1 rounded-sm bg-blue-500 text-white'>
+        {mutation.isLoading ? "Submitting..." : "Submit"}
+      </button>
+    </form>
+  );
+};

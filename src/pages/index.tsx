@@ -76,9 +76,11 @@ const PostCard = ({ post }: PostCardProps) => {
         <p className=''>{post.problem}</p>
       </div>
       <div className='mt-6'>
-        <span className='text-sm flex items-center gap-2'>
-          <UserIcon className='w-4' /> 42 people supported
-        </span>
+        {post._count.Comment > 0 && (
+          <span className='text-sm flex items-center gap-2'>
+            <UserIcon className='w-4' /> {post._count.Comment} people supported
+          </span>
+        )}
       </div>
     </li>
   );
