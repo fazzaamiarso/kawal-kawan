@@ -23,4 +23,16 @@ export const postRouter = createRouter()
       });
       return details;
     },
+  })
+  .mutation("new", {
+    input: z.object({
+      title: z.string(),
+      problem: z.string(),
+      userId: z.string(),
+    }),
+    async resolve({ input, ctx }) {
+      await ctx.prisma.post.create({
+        data: input,
+      });
+    },
   });

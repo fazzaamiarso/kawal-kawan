@@ -1,15 +1,8 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import { trpc } from "../utils/trpc";
+import { inferQueryOutput, trpc } from "../utils/trpc";
 import Image from "next/image";
-import { Reactions } from "@prisma/client";
 import Link from "next/link";
-
-const reactions: { name: string; key: Reactions }[] = [
-  { key: "RELATABLE", name: "✋ Relatable" },
-  { key: "KEEP_GOING", name: "🔥 Keep going!" },
-  { key: "GREAT_JOB", name: "👍 Great job!" },
-];
 
 const Home: NextPage = () => {
   const { data, isLoading } = trpc.useQuery(["post.all"]);
@@ -22,39 +15,28 @@ const Home: NextPage = () => {
         <link rel='icon' href='/favicon.ico' />
       </Head>
 
-      <main className='container mx-auto flex flex-col items-center justify-center min-h-screen p-4'>
-        <h1 className='text-5xl md:text-[5rem] leading-normal font-extrabold text-gray-700'>
-          Peer Support
-        </h1>
+      <main className='layout mt-12'>
+        <h1 className='text-2xl'>Peer Support</h1>
+        <div className='w-full p-3 flex items-center bg-gray-100 rounded-md'>
+          <Image
+            src={"https://avatars.dicebear.com/api/big-smile/random.svg"}
+            alt='dummy profile'
+            width='50'
+            height='50'
+          />
+          <Link href='/post/new'>
+            <a className='px-4 py-1 ring-1 ring-black rounded-full'>
+              Share your worry, problems, anything
+            </a>
+          </Link>
+        </div>
         <div className='pt-6 flex justify-center items-center w-full'>
           {!isLoading && data?.length === 0 && <p>No Posts Yet</p>}
           {data ? (
             <ul className='space-y-6'>
-              {data.map(post => {
-                return (
-                  <>
-                    <li key={post.id + Math.random()} className='bg-gray-100 p-4 rounded-md '>
-                      <div className='flex items-center gap-2'>
-                        <Image
-                          src={post.User.avatarUrl}
-                          alt={post.User.name}
-                          width='50'
-                          height='50'
-                        />
-                        <div>
-                          <h2>
-                            <Link href={`/post/${post.id}`}>
-                              <a className='text-blue-500 hover:underline'>{post.User.name}</a>
-                            </Link>
-                          </h2>
-                          <span>{post.User.confidencePoint} confidence point</span>
-                        </div>
-                      </div>
-                      <p className=''>{post.problem}</p>
-                    </li>
-                  </>
-                );
-              })}
+              {data.map(post => (
+                <PostCard key={post.id} post={post} />
+              ))}
             </ul>
           ) : (
             <p>Loading..</p>
@@ -66,3 +48,26 @@ const Home: NextPage = () => {
 };
 
 export default Home;
+
+type PostCardProps = {
+  post: inferQueryOutput<"post.all">[0];
+};
+const PostCard = ({ post }: PostCardProps) => {
+  return (
+    <li className='bg-gray-100 p-4 rounded-md '>
+      <div className='flex items-center gap-2'>
+        <Image src={post.User.avatarUrl} alt={post.User.name} width='50' height='50' />
+        <div>
+          <h2>
+            <Link href={`/post/${post.id}`}>
+              <a className='text-blue-500 hover:underline'>
+                {post.User.name} - {post.User.confidencePoint}
+              </a>
+            </Link>
+          </h2>
+        </div>
+      </div>
+      <p className=''>{post.problem}</p>
+    </li>
+  );
+};

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { PlusIcon } from "@heroicons/react/20/solid";
 
 const navigation = [
   { name: "Home", href: "/", current: true },
@@ -24,16 +25,18 @@ export default function Navbar() {
             })}
           </ul>
         </nav>
-        <Link href='#'>
-          <a className='' aria-label='go to profile'>
-            <Image
-              src='https://avatars.dicebear.com/api/big-smile/random.svg'
-              alt=''
-              width='40'
-              height='40'
-            />
-          </a>
-        </Link>
+        <div className='flex items-center gap-2'>
+          <Link href='#'>
+            <a className='' aria-label='go to profile'>
+              <Image
+                src='https://avatars.dicebear.com/api/big-smile/random.svg'
+                alt=''
+                width='40'
+                height='40'
+              />
+            </a>
+          </Link>
+        </div>
       </div>
     </header>
   );
