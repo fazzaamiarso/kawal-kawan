@@ -3,6 +3,8 @@ import Head from "next/head";
 import { inferQueryOutput, trpc } from "../utils/trpc";
 import Image from "next/image";
 import Link from "next/link";
+import dayjs from "dayjs";
+import { ChatBubbleBottomCenterTextIcon, UserIcon } from "@heroicons/react/20/solid";
 
 const Home: NextPage = () => {
   const { data, isLoading } = trpc.useQuery(["post.all"]);
@@ -54,20 +56,30 @@ type PostCardProps = {
 };
 const PostCard = ({ post }: PostCardProps) => {
   return (
-    <li className='bg-gray-100 p-4 rounded-md '>
-      <div className='flex items-center gap-2'>
-        <Image src={post.User.avatarUrl} alt={post.User.name} width='50' height='50' />
-        <div>
-          <h2>
-            <Link href={`/post/${post.id}`}>
-              <a className='text-blue-500 hover:underline'>
-                {post.User.name} - {post.User.confidencePoint}
-              </a>
-            </Link>
-          </h2>
+    <li className='bg-gray-100 p-6 rounded-md space-y-4'>
+      <div className='flex items-center gap-4'>
+        <Image src={post.User.avatarUrl} alt={post.User.name} width='40' height='40' />
+        <div className='flex flex-col items-start'>
+          <span className='text-sm'>
+            {post.User.name} - {post.User.confidencePoint}
+          </span>
+
+          <span className='text-xs'>posted at {dayjs(post.createdAt).toString()}</span>
         </div>
       </div>
-      <p className=''>{post.problem}</p>
+      <div className=''>
+        <h2 className='text-lg font-semibold'>
+          <Link href={`/post/${post.id}`}>
+            <a className=' hover:text-blue-500 hover:underline'>{post.title}</a>
+          </Link>
+        </h2>
+        <p className=''>{post.problem}</p>
+      </div>
+      <div className='mt-6'>
+        <span className='text-sm flex items-center gap-2'>
+          <UserIcon className='w-4' /> 42 people supported
+        </span>
+      </div>
     </li>
   );
 };
