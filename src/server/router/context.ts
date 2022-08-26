@@ -22,10 +22,11 @@ export const createContextInner = async (opts: CreateContextOptions) => {
  * This is the actual context you'll use in your router
  * @link https://trpc.io/docs/context
  **/
-export const createContext = async (
-  opts: trpcNext.CreateNextContextOptions
-) => {
-  return await createContextInner({});
+export const createContext = async (opts: trpcNext.CreateNextContextOptions) => {
+  const req = opts.req;
+  const res = opts.res;
+  const innerCtx = await createContextInner({});
+  return { ...innerCtx, req, res };
 };
 
 type Context = trpc.inferAsyncReturnType<typeof createContext>;
