@@ -2,6 +2,13 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import { trpc } from "../utils/trpc";
 import Image from "next/image";
+import { Reactions } from "@prisma/client";
+
+const reactions: { name: string; key: Reactions }[] = [
+  { key: "RELATABLE", name: "✋ Relatable" },
+  { key: "KEEP_GOING", name: "🔥 Keep going!" },
+  { key: "GREAT_JOB", name: "👍 Great job!" },
+];
 
 const Home: NextPage = () => {
   const { data, isLoading } = trpc.useQuery(["post.all"]);
@@ -18,7 +25,7 @@ const Home: NextPage = () => {
         <h1 className='text-5xl md:text-[5rem] leading-normal font-extrabold text-gray-700'>
           Peer Support
         </h1>
-        <div className='pt-6 text-2xl flex justify-center items-center w-full'>
+        <div className='pt-6 flex justify-center items-center w-full'>
           {!isLoading && data?.posts.length === 0 && <p>No Posts Yet</p>}
           {data ? (
             <ul className='space-y-6'>
@@ -39,6 +46,15 @@ const Home: NextPage = () => {
                         </div>
                       </div>
                       <p className=''>{post.problem}</p>
+                      <div className='flex gap-2'>
+                        {reactions.map(reaction => (
+                          <button
+                            key={reaction.key}
+                            className='px-2 py-1 text-sm  rounded-md bg-yellow-300'>
+                            {reaction.name}
+                          </button>
+                        ))}
+                      </div>
                     </li>
                     <li key={post.id + Math.random()} className='bg-gray-100 p-4 rounded-md '>
                       <div className='flex items-center gap-2'>
