@@ -10,7 +10,7 @@ type UserMetaProps = {
 export const UserMeta = ({ avatarUrl, username, confidencePoint, createdAt }: UserMetaProps) => {
   return (
     <div className='flex items-center gap-4'>
-      <Image src={avatarUrl} alt={username} width='40' height='40' />
+      <Image src={avatarUrl} alt={username} width={40} height={40} />
       <div className='flex flex-col items-start'>
         <div>
           <span className=''>{username}</span> -{" "}

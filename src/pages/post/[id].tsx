@@ -6,6 +6,8 @@ import { trpc } from "@/utils/trpc";
 import { NextSeo } from "next-seo";
 import clsx from "clsx";
 import { UserMeta } from "@/components/UserMeta";
+import { ArchiveBoxXMarkIcon } from "@heroicons/react/20/solid";
+import GoBackButton from "@/components/BackButton";
 
 const reactions: { name: string; key: Reactions }[] = [
   { key: "RELATABLE", name: "✋ Relatable" },
@@ -29,53 +31,67 @@ const PostDetail: NextPage = () => {
   const { id } = router.query;
   if (typeof id !== "string") return null;
 
-  const { data } = trpc.useQuery(["post.detail", { id: id as string }]);
-  const { data: comments } = trpc.useQuery(["comment.all", { postId: id as string }]);
+  const { data, isLoading: isHeaderLoading } = trpc.useQuery(["post.detail", { id: id as string }]);
+  const { data: comments, isLoading } = trpc.useQuery(["comment.all", { postId: id as string }]);
 
   return (
     <>
       <NextSeo title={`${data?.title}`} />
-      <main className='layout my-12 space-y-8'>
-        {data && (
-          <div className='w-full'>
-            <h1 className='text-2xl font-bold '>{data.title}</h1>
-            <p className='mb-12'>{data.problem}</p>
-            <UserMeta
-              avatarUrl={data.User.avatarUrl}
-              username={data.User.username || data.User.name}
-              confidencePoint={data.User.confidencePoint}
-              createdAt={data.createdAt}
-            />
+      <main className='layout my-12 space-y-8 lg:grid lg:grid-cols-2 lg:gap-12'>
+        <div>
+          <GoBackButton />
+          {isHeaderLoading && !data && <HeaderLoading />}
+          {data && (
+            <div className='mt-8 w-full'>
+              <h1 className='mb-4 text-2xl font-bold '>{data.title}</h1>
+              <p className='mb-12 text-lg'>{data.problem}</p>
+              <UserMeta
+                avatarUrl={data.User.avatarUrl}
+                username={data.User.username || data.User.name}
+                confidencePoint={data.User.confidencePoint}
+                createdAt={data.createdAt}
+              />
+            </div>
+          )}
+          <div className='space-y-4 pt-20'>
+            <h2 className='text-lg font-semibold'>Give support to {data?.User.name}</h2>
+            <SupportForm postId={id} />
           </div>
-        )}
-        <div className='space-y-4 pt-20'>
-          <h2 className='text-lg font-semibold'>Give support to {data?.User.name}</h2>
-          <SupportForm postId={id} />
         </div>
-        {comments && comments.length > 0 ? (
-          <ul className='space-y-4'>
-            {comments.map(comment => {
-              const user = comment.User;
-              return (
-                <li key={comment.id} className='rounded-md bg-gray-50  p-4'>
-                  <UserMeta
-                    avatarUrl={user.avatarUrl}
-                    confidencePoint={user.confidencePoint}
-                    createdAt={comment.createdAt}
-                    username={user.username || user.name}
-                  />
-
-                  <p className='mt-6'>
-                    <span className='font-semibold'>{reactionsObj[comment.reaction]} </span>
-                    {comment.content}
-                  </p>
-                </li>
-              );
-            })}
-          </ul>
-        ) : (
-          <p>No Support yet!</p>
-        )}
+        <div className=''>
+          {isLoading && !comments && (
+            <div className='space-y-4'>
+              <SupportLoading />
+              <SupportLoading />
+              <SupportLoading />
+              <SupportLoading />
+            </div>
+          )}
+          {comments && comments.length > 0 ? (
+            <ul className='flex flex-col gap-4 md:grid md:grid-cols-2 lg:flex'>
+              {comments.map(comment => {
+                const user = comment.User;
+                return (
+                  <li key={comment.id} className='rounded-md bg-gray-50  p-4'>
+                    <UserMeta
+                      avatarUrl={user.avatarUrl}
+                      confidencePoint={user.confidencePoint}
+                      createdAt={comment.createdAt}
+                      username={user.username || user.name}
+                    />
+                    <div className='divider' />
+                    <p className='mt-6'>
+                      <span className='font-semibold'>{reactionsObj[comment.reaction]} </span>
+                      {comment.content}
+                    </p>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            <EmptySupport />
+          )}
+        </div>
       </main>
     </>
   );
@@ -151,5 +167,37 @@ const SupportForm = ({ postId }: { postId: string }) => {
         {mutation.isLoading ? "Submitting..." : "Submit"}
       </button>
     </form>
+  );
+};
+
+const EmptySupport = () => {
+  return (
+    <div className='mt-12 flex flex-col items-center'>
+      <ArchiveBoxXMarkIcon className='aspect-square w-12' />
+      <p>There are no supports yet!</p>
+    </div>
+  );
+};
+
+const SupportLoading = () => {
+  return (
+    <div className='w-full  animate-pulse space-y-3 rounded-md bg-gray-50 p-4'>
+      <div className='h-4 w-5/12 bg-gray-200' />
+      <div className='h-4 w-full bg-gray-200' />
+      <div className='h-4 w-full bg-gray-200' />
+      <div className='h-4 w-full bg-gray-200' />
+    </div>
+  );
+};
+
+const HeaderLoading = () => {
+  return (
+    <div className='w-full animate-pulse space-y-3 rounded-md  p-4'>
+      <div className='mb-5 h-8 w-5/12 bg-gray-400' />
+      <div className='h-4 w-10/12 bg-gray-400' />
+      <div className='h-4 w-10/12 bg-gray-400' />
+      <div className='h-4 w-10/12 bg-gray-400' />
+      <div className='h-4 w-10/12 bg-gray-400' />
+    </div>
   );
 };

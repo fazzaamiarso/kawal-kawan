@@ -45,7 +45,7 @@ const Signup = () => {
     saveFields(data);
     sendVerify({ phoneNumber: data.phoneNumber });
   };
-
+  //TODO:Validate form on errors
   return (
     <>
       <NextSeo title='Signup' />
@@ -110,7 +110,7 @@ const Signup = () => {
               className='w-60'
             />
             <span className='label-text pt-2'>
-              We need to verify your number for security purposes, we don&apos;t store your number
+              We need to verify your number for security purposes.
             </span>
           </div>
           <div className='divider' />

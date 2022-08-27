@@ -19,7 +19,8 @@ const Home: NextPage = () => {
         <div className='col-span-3 lg:col-span-2'>
           <div className=' flex max-w-lg flex-col items-start  gap-4 rounded-md  p-3'>
             <div className='flex items-center font-semibold'>
-              <p className='text-3xl'>Hi, {user?.name}</p>
+              <h1 className='sr-only'>Kawal Kawan Home Page</h1>
+              <p className='text-4xl'>Hi, {user?.name}</p>
               <Image src={user?.avatarUrl ?? ""} alt={user?.name} width='50' height='50' />
             </div>
             <Link href='/post/new'>
@@ -31,6 +32,15 @@ const Home: NextPage = () => {
           <div className='divider max-w-lg ' />
           <div className='w-full pt-6'>
             {!isLoading && data?.length === 0 && <p>No Posts Yet</p>}
+            {isLoading && !data && (
+              <div className='space-y-6'>
+                <PostLoading />
+                <PostLoading />
+                <PostLoading />
+                <PostLoading />
+                <PostLoading />
+              </div>
+            )}
             {data ? (
               <ul className='flex w-full max-w-lg flex-col items-start space-y-6'>
                 {data.map(post => (
@@ -109,11 +119,14 @@ const rankClassNames: Record<string, string> = {
   "3": "bg-[#CD7F32] font-semibold",
 };
 const LeaderboardPanel = () => {
-  const { data: users } = trpc.useQuery(["user.leaderboard"], { refetchOnWindowFocus: false });
+  const { data: users, isLoading } = trpc.useQuery(["user.leaderboard"], {
+    refetchOnWindowFocus: false,
+  });
   return (
     <div className=''>
       <h3 className='mb-4 text-lg font-semibold'>Top Supporter</h3>
-      <ul className='space-y-2'>
+      <ul className='flex flex-col items-center space-y-2'>
+        {isLoading && !users && <LoadingSpinner />}
         {users?.map((user, idx) => {
           return (
             <li key={user.id} className='flex w-full items-center'>
@@ -127,11 +140,22 @@ const LeaderboardPanel = () => {
                 </div>
                 <div>{user.username || user.name}</div>
               </div>
-              <div className='ml-auto'>{user.confidencePoint}</div>
+              <div className='ml-auto text-primary'>{user.confidencePoint}</div>
             </li>
           );
         })}
       </ul>
+    </div>
+  );
+};
+
+const PostLoading = () => {
+  return (
+    <div className='w-full  animate-pulse space-y-3 rounded-md bg-gray-50 p-4'>
+      <div className='h-4 w-5/12 bg-gray-200' />
+      <div className='h-4 w-full bg-gray-200' />
+      <div className='h-4 w-full bg-gray-200' />
+      <div className='h-4 w-full bg-gray-200' />
     </div>
   );
 };

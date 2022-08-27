@@ -5,7 +5,7 @@ import Link from "next/link";
 const navigation = [
   { name: "Home", href: "/", current: true },
   // { name: "Posts", href: "#", current: true },
-  { name: "Leadeboard", href: "#", current: false },
+  { name: "Leaderboard", href: "/leaderboard", current: false },
 ];
 
 export default function Navbar() {
