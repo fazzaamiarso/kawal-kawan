@@ -5,12 +5,12 @@ export const SEO = () => {
     <DefaultSeo
       openGraph={{
         type: "website",
-        url: "",
+        url: "https://res.cloudinary.com/dkiqn0gqg/image/upload/v1661641790/kawal-kawan-OG_tbw62x.png",
         title: "Kawal Kawan",
         images: [
           {
-            url: "",
-            alt: "",
+            url: "https://res.cloudinary.com/dkiqn0gqg/image/upload/v1661641790/kawal-kawan-OG_tbw62x.png",
+            alt: "kawal kawan og",
             type: "image/png",
             height: 630,
             width: 1200,
