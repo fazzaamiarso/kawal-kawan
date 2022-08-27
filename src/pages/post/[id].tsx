@@ -35,7 +35,7 @@ const PostDetail: NextPage = () => {
   return (
     <>
       <NextSeo title={`${data?.title}`} />
-      <main className='layout mt-12 space-y-8'>
+      <main className='layout my-12 space-y-8'>
         {data && (
           <div className='w-full'>
             <h1 className='text-2xl font-bold '>{data.title}</h1>
@@ -57,7 +57,7 @@ const PostDetail: NextPage = () => {
             {comments.map(comment => {
               const user = comment.User;
               return (
-                <li key={comment.id} className='rounded-md bg-gray-100  p-4'>
+                <li key={comment.id} className='rounded-md bg-gray-50  p-4'>
                   <UserMeta
                     avatarUrl={user.avatarUrl}
                     confidencePoint={user.confidencePoint}

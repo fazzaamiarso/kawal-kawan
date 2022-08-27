@@ -4,14 +4,14 @@ import Link from "next/link";
 
 const navigation = [
   { name: "Home", href: "/", current: true },
-  { name: "Posts", href: "#", current: true },
+  // { name: "Posts", href: "#", current: true },
   { name: "Leadeboard", href: "#", current: false },
 ];
 
 export default function Navbar() {
   const { user } = useAuth();
   return (
-    <header className='w-full py-4 bg-gray-200'>
+    <header className='w-full bg-gray-200 py-4'>
       <div className='layout flex items-center justify-between'>
         <nav className='w-full'>
           <ul className='flex items-center gap-4'>

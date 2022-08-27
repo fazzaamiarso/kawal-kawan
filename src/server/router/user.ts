@@ -49,4 +49,23 @@ export const userRouter = createRouter()
       const user = ctx.user;
       return { user };
     },
+  })
+  .query("leaderboard", {
+    async resolve({ ctx }) {
+      const topTenUsers = await ctx.prisma.user.findMany({
+        take: 10,
+        orderBy: { confidencePoint: "desc" },
+      });
+      return topTenUsers;
+    },
+  })
+  .query("points", {
+    async resolve({ ctx }) {
+      const user = await ctx.prisma.user.findFirst({
+        where: { id: ctx.user?.id },
+        select: { confidencePoint: true },
+      });
+      if (!user) throw Error(`No user found! Which should exist.`);
+      return user.confidencePoint;
+    },
   });
