@@ -2,9 +2,9 @@ import type { NextPage } from "next";
 import { inferQueryOutput, trpc } from "../utils/trpc";
 import Image from "next/image";
 import Link from "next/link";
-import dayjs from "dayjs";
 import { UserIcon } from "@heroicons/react/20/solid";
 import { useAuth } from "@/hooks/use-auth";
+import { UserMeta } from "@/components/UserMeta";
 
 const Home: NextPage = () => {
   const { user } = useAuth();
@@ -12,17 +12,21 @@ const Home: NextPage = () => {
 
   return (
     <main className='layout mt-12'>
-      <h1 className='text-2xl'>Kawal Kawan</h1>
+      <h1 className='text-2xl'></h1>
       <div className='grid grid-cols-3'>
         <div className='col-span-2'>
-          <div className=' flex  max-w-lg items-center rounded-md bg-gray-100 p-3'>
-            <Image src={user?.avatarUrl ?? ""} alt={user?.name} width='50' height='50' />
+          <div className=' flex max-w-lg flex-col items-start  gap-4 rounded-md  p-3'>
+            <div className='flex items-center font-semibold'>
+              <p className='text-3xl'>Hi, {user?.name}</p>
+              <Image src={user?.avatarUrl ?? ""} alt={user?.name} width='50' height='50' />
+            </div>
             <Link href='/post/new'>
-              <a className='rounded-full px-4 py-1 ring-1 ring-black'>
+              <a className='btn btn-primary btn-block rounded-full'>
                 Share your worry, problems, anything
               </a>
             </Link>
           </div>
+          <div className='divider max-w-lg ' />
           <div className='w-full pt-6'>
             {!isLoading && data?.length === 0 && <p>No Posts Yet</p>}
             {data ? (
@@ -36,12 +40,23 @@ const Home: NextPage = () => {
             )}
           </div>
         </div>
-        <aside className='w-full'>
-          <h3>Top Supporter</h3>
-          <div className='w-full bg-yellow-200 p-4'>Some conten</div>
-          <div className='w-full bg-yellow-200 p-4'>Some conten</div>
-          <div className='w-full bg-yellow-200 p-4'>Some conten</div>
-          <div className='w-full bg-yellow-200 p-4'>Some conten</div>
+        <aside className='w-full space-y-8'>
+          <div className='stats  w-full pl-0'>
+            <div className='stat pl-0'>
+              <div className='stat-title'>Total Page Views</div>
+              <div className='stat-value'>89,400</div>
+              <div className='stat-desc'>21% more than last month</div>
+            </div>
+          </div>
+          <div className=''>
+            <h3 className='mb-4 text-lg font-semibold'>Top Supporter</h3>
+            <ul>
+              <div className='w-full bg-yellow-200 p-4'>Some conten</div>
+              <div className='w-full bg-yellow-200 p-4'>Some conten</div>
+              <div className='w-full bg-yellow-200 p-4'>Some conten</div>
+              <div className='w-full bg-yellow-200 p-4'>Some conten</div>
+            </ul>
+          </div>
         </aside>
       </div>
     </main>
@@ -54,18 +69,16 @@ type PostCardProps = {
   post: inferQueryOutput<"post.all">[0];
 };
 const PostCard = ({ post }: PostCardProps) => {
+  const user = post.User;
+
   return (
     <li className='w-full space-y-4 rounded-md bg-gray-100 p-6'>
-      <div className='flex items-center gap-4'>
-        <Image src={post.User.avatarUrl} alt={post.User.name} width='40' height='40' />
-        <div className='flex flex-col items-start'>
-          <span className='text-sm'>
-            {post.User.name} - {post.User.confidencePoint}
-          </span>
-
-          <span className='text-xs'>posted at {dayjs(post.createdAt).toString()}</span>
-        </div>
-      </div>
+      <UserMeta
+        avatarUrl={user.avatarUrl}
+        username={user.username || user.name}
+        confidencePoint={user.confidencePoint}
+        createdAt={post.createdAt}
+      />
       <div className=''>
         <h2 className='text-lg font-semibold'>
           <Link href={`/post/${post.id}`}>

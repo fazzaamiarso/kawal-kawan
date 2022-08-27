@@ -1,12 +1,11 @@
 import { Reactions } from "@prisma/client";
 import { NextPage } from "next";
-import Image from "next/image";
 import { useRouter } from "next/router";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { trpc } from "@/utils/trpc";
 import { NextSeo } from "next-seo";
 import clsx from "clsx";
-import { dateFormatter } from "@/lib/dayjs";
+import { UserMeta } from "@/components/UserMeta";
 
 const reactions: { name: string; key: Reactions }[] = [
   { key: "RELATABLE", name: "✋ Relatable" },
@@ -66,7 +65,7 @@ const PostDetail: NextPage = () => {
                     username={user.username || user.name}
                   />
 
-                  <p>
+                  <p className='mt-6'>
                     <span className='font-semibold'>{reactionsObj[comment.reaction]} </span>
                     {comment.content}
                   </p>
@@ -152,26 +151,5 @@ const SupportForm = ({ postId }: { postId: string }) => {
         {mutation.isLoading ? "Submitting..." : "Submit"}
       </button>
     </form>
-  );
-};
-
-type UserMetaProps = {
-  avatarUrl: string;
-  username: string;
-  confidencePoint: number;
-  createdAt: Date;
-};
-const UserMeta = ({ avatarUrl, username, confidencePoint, createdAt }: UserMetaProps) => {
-  return (
-    <div className='mb-6 flex items-center gap-4'>
-      <Image src={avatarUrl} alt={username} width='40' height='40' />
-      <div className='flex flex-col items-start'>
-        <div>
-          <span className=''>{username}</span> -{" "}
-          <span className='text-sm font-semibold text-blue-500'>{confidencePoint}</span>
-        </div>
-        <span className='text-xs text-gray-400'>posted {dateFormatter(createdAt).fromNow()}</span>
-      </div>
-    </div>
   );
 };
