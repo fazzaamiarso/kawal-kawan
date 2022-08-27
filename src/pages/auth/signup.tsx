@@ -109,6 +109,7 @@ const Signup = () => {
               defaultCountry='ID'
               rules={{ required: true }}
               className='w-60'
+              autoComplete='off'
             />
             <span className='label-text pt-2'>
               We need to verify your number for security purposes.
