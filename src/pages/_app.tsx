@@ -27,7 +27,7 @@ const MyApp = ({ Component, pageProps }: AppPropsWithAuthAndLayout) => {
   return (
     <>
       <SEO />
-      <Navbar />
+      {hasAuth && <Navbar />}
       {hasAuth ? <Auth>{page}</Auth> : page}
     </>
   );
@@ -39,7 +39,6 @@ const Auth = ({ children }: { children: ReactNode }) => {
   const isAuthenticated = Boolean(user);
   const isAuthRoute = router.pathname.startsWith("/auth");
   useEffect(() => {
-    console.log(router.pathname);
     if (isLoading) return;
     if (!isAuthenticated) {
       if (isAuthRoute) return;

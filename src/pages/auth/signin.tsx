@@ -42,7 +42,7 @@ const Signin = () => {
     <>
       <NextSeo title='Signin' />
       <main className='layout'>
-        <div className='my-8 '>
+        <div className='my-8 mt-20 '>
           <h1 className='text-2xl font-bold'>Sign In to Kawal Kawan</h1>
           <p className=''>
             Doesn&apos;t have an account?{" "}
@@ -52,7 +52,7 @@ const Signin = () => {
           </p>
         </div>
         <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col'>
-          <div className='spacy-4 mb-8'>
+          <div className='mb-8 space-y-4'>
             <div className='form-control'>
               <label htmlFor='username' className='label'>
                 Username

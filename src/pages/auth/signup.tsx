@@ -50,7 +50,7 @@ const Signup = () => {
     <>
       <NextSeo title='Signup' />
       <main className='layout'>
-        <div className='my-8 '>
+        <div className='my-8 mt-20 '>
           <h1 className='text-2xl font-bold'>Sign up to Kawal Kawan</h1>
           <p className=''>
             Already have an account?{" "}
@@ -114,7 +114,9 @@ const Signup = () => {
             </span>
           </div>
           <div className='divider' />
-          <button className={clsx("btn btn-primary ml-auto ")}>Register</button>
+          <button className={clsx("btn btn-primary ml-auto", isLoading && "loading")}>
+            Register
+          </button>
         </form>
       </main>
     </>
