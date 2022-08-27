@@ -1,4 +1,5 @@
 import { trpc } from "@/utils/trpc";
+import clsx from "clsx";
 import { NextPage } from "next";
 import { NextSeo } from "next-seo";
 import { useRouter } from "next/router";
@@ -15,6 +16,7 @@ const NewPost: NextPage = () => {
   const mutation = trpc.useMutation(["post.new"]);
 
   const onSubmit: SubmitHandler<FormValues> = data => {
+    return;
     if (mutation.isLoading) return;
     mutation.mutate({ ...data }, { onSuccess: () => router.replace("/") });
   };
@@ -22,22 +24,36 @@ const NewPost: NextPage = () => {
     <>
       <NextSeo title='New Post' />
       <main className='layout mt-12'>
-        <h1 className='text-2xl'>Peer Support</h1>
+        <h1 className='mb-8 text-2xl font-bold'>New Post</h1>
         <form className='space-y-6' onSubmit={handleSubmit(onSubmit)}>
-          <div className='flex flex-col gap-2'>
-            <label htmlFor='title'>Title</label>
-            <input type='text' id='title' {...register("title", { required: true })} />
+          <div className='form-control'>
+            <label htmlFor='title' className='label'>
+              Title
+            </label>
+            <input
+              type='text'
+              id='title'
+              placeholder='Trying to deal with my loneliness'
+              {...register("title", { required: true })}
+              className='input input-bordered'
+            />
           </div>
-          <div className='flex flex-col gap-2'>
-            <label htmlFor='problem'>What do you want to tell the world?</label>
+          <div className='form-control'>
+            <label htmlFor='problem' className='label'>
+              What do you want to tell the world?
+            </label>
             <textarea
               id='problem'
-              className='resize-y'
+              className='textarea textarea-bordered '
               {...register("problem", { required: true })}
             />
           </div>
 
-          <button className='rounded-md bg-red-700 p-1 px-4 text-white'>
+          <button
+            className={clsx(
+              "btn btn-primary px-4  capitalize ",
+              mutation.isLoading ? "loading" : "",
+            )}>
             {mutation.isLoading ? "Posting..." : "Post"}
           </button>
         </form>
