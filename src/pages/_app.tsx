@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { NextPage } from "next";
 import { AppProps } from "next/app";
 import { SEO } from "@/components/SEO";
+import { useRouter } from "next/router";
 
 type NextPageWithAuthAndLayout = NextPage & {
   hasAuth?: boolean;
@@ -33,12 +34,18 @@ const MyApp = ({ Component, pageProps }: AppPropsWithAuthAndLayout) => {
 };
 
 const Auth = ({ children }: { children: ReactNode }) => {
+  const router = useRouter();
   const { user, isLoading } = useAuth();
   const isAuthenticated = Boolean(user);
+  const isAuthRoute = router.pathname.startsWith("/auth");
   useEffect(() => {
+    console.log(router.pathname);
     if (isLoading) return;
-    if (!isAuthenticated) return window.location.replace("/auth/signup");
-  }, [isAuthenticated, isLoading]);
+    if (!isAuthenticated) {
+      if (isAuthRoute) return;
+      router.replace("/auth/signup");
+    }
+  }, [isAuthRoute, isAuthenticated, isLoading, router]);
 
   if (isAuthenticated) return <>{children}</>;
   return null;

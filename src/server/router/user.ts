@@ -4,13 +4,32 @@ import { createRouter } from "./context";
 import Iron from "@hapi/iron";
 import { env } from "env/server.mjs";
 import { setTokenCookie } from "@/lib/cookie";
-import { hashPassword } from "@/lib/bcrypt";
+import { hashPassword, verifyPassword } from "@/lib/bcrypt";
 
 const generateAvatar = (seed: string) => {
   return `https://avatars.dicebear.com/api/big-smile/${seed}.svg`;
 };
 
 export const userRouter = createRouter()
+  .mutation("signin", {
+    input: z.object({
+      username: z.string(),
+      password: z.string(),
+    }),
+    async resolve({ ctx, input }) {
+      const user = await ctx.prisma.user.findFirst({
+        where: { username: input.username },
+      });
+      if (!user?.passwordHash) throw Error("Unauthorized");
+      console.log(user);
+
+      const isVerified = await verifyPassword(input.password, user?.passwordHash);
+      if (!isVerified) throw Error("Unauthorized");
+
+      const token = await Iron.seal(user, env.AUTH_SECRET, Iron.defaults);
+      setTokenCookie(ctx.res, token);
+    },
+  })
   .mutation("signup", {
     input: z.object({
       name: z.string(),
@@ -31,7 +50,7 @@ export const userRouter = createRouter()
           avatarUrl: generateAvatar(input.username),
         },
       });
-
+      if (!user) throw Error("Signup failed exist!");
       const token = await Iron.seal(user, env.AUTH_SECRET, Iron.defaults);
       setTokenCookie(ctx.res, token);
     },

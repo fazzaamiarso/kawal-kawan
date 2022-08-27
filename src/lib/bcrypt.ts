@@ -8,3 +8,8 @@ export const hashPassword = async (password: string) => {
 
   return hashedPassword;
 };
+
+export const verifyPassword = async (password: string, hash: string) => {
+  const isVerified = await bcrypt.compare(password, hash);
+  return isVerified;
+};
