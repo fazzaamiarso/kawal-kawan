@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { UserMeta } from "@/components/UserMeta";
 import clsx from "clsx";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { useRouter } from "next/router";
 
 const Home: NextPage = () => {
   const { user } = useAuth();
@@ -67,10 +68,16 @@ type PostCardProps = {
   post: inferQueryOutput<"post.all">[0];
 };
 const PostCard = ({ post }: PostCardProps) => {
+  const router = useRouter();
   const user = post.User;
 
+  const onClick = () => {
+    router.push(`/post/${post.id}`);
+  };
   return (
-    <li className='w-full space-y-4 rounded-md bg-gray-50 p-6'>
+    <li
+      onClick={onClick}
+      className='group w-full space-y-4 rounded-md bg-gray-50 p-6 hover:cursor-pointer'>
       <UserMeta
         avatarUrl={user.avatarUrl}
         username={user.username || user.name}
@@ -81,7 +88,9 @@ const PostCard = ({ post }: PostCardProps) => {
       <div className=''>
         <h2 className='text-lg font-semibold'>
           <Link href={`/post/${post.id}`}>
-            <a className=' hover:text-blue-500 hover:underline'>{post.title}</a>
+            <a className=' hover:text-primary hover:underline group-hover:text-primary'>
+              {post.title}
+            </a>
           </Link>
         </h2>
         <p className=''>{post.problem}</p>

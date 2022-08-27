@@ -1,4 +1,4 @@
-import { Reactions } from "@prisma/client";
+import { Comment, Reactions, User } from "@prisma/client";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -6,8 +6,10 @@ import { trpc } from "@/utils/trpc";
 import { NextSeo } from "next-seo";
 import clsx from "clsx";
 import { UserMeta } from "@/components/UserMeta";
-import { ArchiveBoxXMarkIcon } from "@heroicons/react/20/solid";
+import { ArchiveBoxXMarkIcon, HandThumbUpIcon as HandThumbUpFull } from "@heroicons/react/20/solid";
+import { HandThumbUpIcon } from "@heroicons/react/24/outline";
 import GoBackButton from "@/components/BackButton";
+import { useAuth } from "@/hooks/use-auth";
 
 const reactions: { name: string; key: Reactions }[] = [
   { key: "RELATABLE", name: "✋ Relatable" },
@@ -27,6 +29,7 @@ type FormValues = {
 };
 
 const PostDetail: NextPage = () => {
+  const { user } = useAuth();
   const router = useRouter();
   const { id } = router.query;
   if (typeof id !== "string") return null;
@@ -34,6 +37,7 @@ const PostDetail: NextPage = () => {
   const { data, isLoading: isHeaderLoading } = trpc.useQuery(["post.detail", { id: id as string }]);
   const { data: comments, isLoading } = trpc.useQuery(["comment.all", { postId: id as string }]);
 
+  const isPostOwner = user?.id === data?.User.id;
   return (
     <>
       <NextSeo title={`${data?.title}`} />
@@ -70,21 +74,13 @@ const PostDetail: NextPage = () => {
           {comments && comments.length > 0 ? (
             <ul className='flex flex-col gap-4 md:grid md:grid-cols-2 lg:flex'>
               {comments.map(comment => {
-                const user = comment.User;
                 return (
-                  <li key={comment.id} className='rounded-md bg-gray-50  p-4'>
-                    <UserMeta
-                      avatarUrl={user.avatarUrl}
-                      confidencePoint={user.confidencePoint}
-                      createdAt={comment.createdAt}
-                      username={user.username || user.name}
-                    />
-                    <div className='divider' />
-                    <p className='mt-6'>
-                      <span className='font-semibold'>{reactionsObj[comment.reaction]} </span>
-                      {comment.content}
-                    </p>
-                  </li>
+                  <CommentCard
+                    key={comment.id}
+                    comment={comment}
+                    user={comment.User}
+                    isPostOwner={isPostOwner}
+                  />
                 );
               })}
             </ul>
@@ -98,6 +94,53 @@ const PostDetail: NextPage = () => {
 };
 
 export default PostDetail;
+
+type CommentCardProps = {
+  comment: Comment;
+  user: User;
+  isPostOwner: boolean;
+};
+const CommentCard = ({ comment, user, isPostOwner }: CommentCardProps) => {
+  const utils = trpc.useContext();
+  const mutation = trpc.useMutation(["comment.mark-helpful"], {
+    onSuccess: () => {
+      utils.invalidateQueries(["comment.all"]);
+      utils.invalidateQueries(["post.detail"]);
+    },
+  });
+
+  const markHelpful = () => {
+    if (mutation.isLoading) return;
+    mutation.mutate({ commentId: comment.id });
+  };
+  return (
+    <li key={comment.id} className='rounded-md bg-gray-50  p-4'>
+      <div className='flex w-full items-center justify-between'>
+        <UserMeta
+          avatarUrl={user.avatarUrl}
+          confidencePoint={user.confidencePoint}
+          createdAt={comment.createdAt}
+          username={user.username || user.name}
+        />
+        {isPostOwner && !comment.isHelpful ? (
+          <button className='p-3 ' onClick={markHelpful}>
+            <HandThumbUpIcon className='w-6' aria-label='' />
+          </button>
+        ) : null}
+        {comment.isHelpful && (
+          <button className='p-3'>
+            <HandThumbUpFull className='w-6' aria-label='' />
+          </button>
+        )}
+      </div>
+      <div className='divider' />
+      <p className='mt-6'>
+        <span className='font-semibold'>{reactionsObj[comment.reaction]} </span>
+        {comment.content}
+      </p>
+    </li>
+  );
+};
 
 const SupportForm = ({ postId }: { postId: string }) => {
   const utils = trpc.useContext();

@@ -16,7 +16,6 @@ const NewPost: NextPage = () => {
   const mutation = trpc.useMutation(["post.new"]);
 
   const onSubmit: SubmitHandler<FormValues> = data => {
-    return;
     if (mutation.isLoading) return;
     mutation.mutate({ ...data }, { onSuccess: () => router.replace("/") });
   };

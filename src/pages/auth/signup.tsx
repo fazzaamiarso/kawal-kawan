@@ -81,6 +81,7 @@ const Signup = () => {
               id='username'
               type='text'
               autoComplete='off'
+              maxLength={8}
               className='input input-bordered'
             />
           </div>

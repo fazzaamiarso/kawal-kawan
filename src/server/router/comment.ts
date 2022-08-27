@@ -33,4 +33,20 @@ export const commentRouter = createRouter()
         data: { confidencePoint: { increment: Points.Supporting } },
       });
     },
+  })
+  .mutation("mark-helpful", {
+    input: z.object({
+      commentId: z.number(),
+    }),
+    async resolve({ ctx, input }) {
+      const comment = await ctx.prisma.comment.update({
+        where: { id: input.commentId },
+        data: { isHelpful: true },
+      });
+      await ctx.prisma.user.update({
+        where: { id: comment.userId },
+        data: { confidencePoint: { increment: Points.Helpful } },
+      });
+      return null;
+    },
   });
