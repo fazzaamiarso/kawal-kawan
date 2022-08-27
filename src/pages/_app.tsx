@@ -8,6 +8,7 @@ import { ReactNode, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { NextPage } from "next";
 import { AppProps } from "next/app";
+import { SEO } from "@/components/SEO";
 
 type NextPageWithAuthAndLayout = NextPage & {
   hasAuth?: boolean;
@@ -24,6 +25,7 @@ const MyApp = ({ Component, pageProps }: AppPropsWithAuthAndLayout) => {
   const hasAuth = Component.hasAuth === undefined || Component.hasAuth;
   return (
     <>
+      <SEO />
       <Navbar />
       {hasAuth ? <Auth>{page}</Auth> : page}
     </>
@@ -35,7 +37,7 @@ const Auth = ({ children }: { children: ReactNode }) => {
   const isAuthenticated = Boolean(user);
   useEffect(() => {
     if (isLoading) return;
-    if (!isAuthenticated) return window.location.replace("/auth/signin");
+    if (!isAuthenticated) return window.location.replace("/auth/signup");
   }, [isAuthenticated, isLoading]);
 
   if (isAuthenticated) return <>{children}</>;
