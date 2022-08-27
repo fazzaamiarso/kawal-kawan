@@ -1,18 +1,22 @@
 import { useAuth } from "@/hooks/use-auth";
 import Image from "next/image";
 import Link from "next/link";
+import Logo from "@/assets/logo.png";
 
 const navigation = [
-  { name: "Home", href: "/", current: true },
+  { name: "Home", href: "/" },
   // { name: "Posts", href: "#", current: true },
-  { name: "Leaderboard", href: "/leaderboard", current: false },
+  { name: "Leaderboard", href: "/leaderboard" },
 ];
 
 export default function Navbar() {
   const { user } = useAuth();
   return (
     <header className='w-full bg-gray-200 py-4'>
-      <div className='layout flex items-center justify-between'>
+      <div className='layout flex items-center justify-between gap-10'>
+        <div className='w-24'>
+          <Image src={Logo} alt='Kawal Kawan Logo' objectFit='contain' />
+        </div>
         <nav className='w-full'>
           <ul className='flex items-center gap-4'>
             {navigation.map(nav => {

@@ -10,6 +10,8 @@ import { NextPage } from "next";
 import { AppProps } from "next/app";
 import { SEO } from "@/components/SEO";
 import { useRouter } from "next/router";
+import Head from "next/head";
+import { Footer } from "@/components/Footer";
 
 type NextPageWithAuthAndLayout = NextPage & {
   hasAuth?: boolean;
@@ -27,8 +29,16 @@ const MyApp = ({ Component, pageProps }: AppPropsWithAuthAndLayout) => {
   return (
     <>
       <SEO />
+      <Head>
+        <link rel='apple-touch-icon' sizes='180x180' href='/apple-touch-icon.png' />
+        <link rel='icon' type='image/png' sizes='32x32' href='/favicon-32x32.png' />
+        <link rel='icon' type='image/png' sizes='16x16' href='/favicon-16x16.png' />
+        <link rel='manifest' href='/site.webmanifest' />
+        <link rel='mask-icon' href='/safari-pinned-tab.svg' color='#5bbad5' />
+      </Head>
       {hasAuth && <Navbar />}
       {hasAuth ? <Auth>{page}</Auth> : page}
+      {hasAuth && <Footer />}
     </>
   );
 };
